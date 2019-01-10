@@ -1,0 +1,1176 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.1",
+        "title": "Twitter REST API"
+    },
+    "host": "api.twitter.com",
+    "basePath": "/1.1",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "oauth": {
+            "type": "oauth2",
+            "flow": "implicit",
+            "authorizationUrl": "https://twitter.com/oauth/authorize/?client_id=CLIENT-ID&redirect_uri=REDIRECT-URI&response_type=token",
+            "scopes": {
+                "basic": "to read any and all data related to twitter\n"
+            }
+        }
+    },
+    "security": [
+        {
+            "oauth": [
+                "basic"
+            ]
+        }
+    ],
+    "x-constraint-definitions": [
+        "minimum(f, v)          := value(f) >= v",
+        "exclusiveMinimum(f, v) := value(f) > v",
+        "maximum(f, v)          := value(f) <= v",
+        "exclusiveMaximum(f, v) := value(f) < v",
+        "minLength(f, v)        := string-length(f) > v",
+        "maxLength(f, v)        := string-length(f) < v",
+        "minItems(f, v)         := array-length(f) < v",
+        "maxItems(f, v)         := array-length(f) > v",
+        "enum(f, v_1, v_2)      := value(f) == v_1 OR value(f) == v_2",
+        "required(f)            := present(f)",
+        "string?(f)             := type(f) == String",
+        "number?(f)             := type(f) == Number",
+        "boolean?(f)            := type(f) == Boolean",
+        "xor(f1, f2)            := (present(f1) AND NOT(present(f2))) OR (NOT(present(f1)) AND present(f2))",
+        "dependent(f, f_1)      := present(f_1) -> present(f)",
+        "group(f1, f2)          := (present(f1) -> present(f2)) AND (present(f2) -> present(f1))",
+        "and(f1, f2)            := present(f1) AND present(f2)"
+    ],
+    "paths": {
+      "/direct_messages/new": {
+          "post": {
+              "description": "sends a new direct message to specified user",
+              "security": [
+                  {
+                      "oauth": [
+                          "basic"
+                      ]
+                  }
+              ],
+              "parameters": [
+                  {
+                      "name": "user_id",
+                      "in": "query",
+                      "description": "description",
+                      "type": "number",
+                      "required": false
+                  },
+                  {
+                      "name": "screen_name",
+                      "in": "query",
+                      "description": "screen name of user receiving message",
+                      "type": "string",
+                      "required": false
+                  },
+                  {
+                      "name": "text",
+                      "in": "query",
+                      "description": "text of your direct message",
+                      "type": "string",
+                      "required": true
+                  }
+              ],
+              "x-constraints": [ "xor(user_id, screen_name)"
+              ],
+              "responses": {
+                  "200": {
+                      "description": "OK",
+                      "schema": {
+                          "$ref": "#/definitions/Messages"
+                      }
+                  }
+              }
+          }
+      },
+
+      "/statuses/update": {
+          "post": {
+              "description": "Updates the authenticating user's status",
+              "security": [
+                  {
+                      "oauth": [
+                          "basic"
+                      ]
+                  }
+              ],
+              "parameters": [
+                  {
+                      "name": "status",
+                      "in": "query",
+                      "description": "The text of your status update",
+                      "required": true,
+                      "type": "string"
+                  },
+                  {
+                      "name": "in_reply_to_status_id",
+                      "in": "query",
+                      "description": "The ID of an existing status",
+                      "required": false,
+                      "type": "number"
+                  },
+                  {   "name": "possibly_sensitive",
+                      "in": "query",
+                      "description": "if you upload media that might be considered sensitive",
+                      "type": "string",
+                      "required": false,
+                      "default": "false"
+                  },
+                  {
+                      "name": "lat",
+                      "in": "query",
+                      "description": "The latitude of the location",
+                      "required": false,
+                      "type": "string"
+                  },
+                  {
+                      "name": "long",
+                      "in": "query",
+                      "description": "The longitude of the location",
+                      "required": false,
+                      "type": "string"
+                  },
+                  {
+                      "name": "place_id",
+                      "in": "query",
+                      "description": "A place in the world",
+                      "required": false,
+                      "type": "number"
+                  },
+                  {
+                      "name": "display_coordinates",
+                      "in": "query",
+                      "description": "Whether or not to put a pin on the exact coordinates a tweet",
+                      "required": false,
+                      "type": "string"
+                  },
+                  {
+                      "name": "trim_user",
+                      "in": "query",
+                      "description": "When set to either true, t or 1, each tweet returned in a timeline will include a user object",
+                      "required": false,
+                      "type": "string"
+                  },
+                  {
+                      "name": "media_ids",
+                      "in": "query",
+                      "description": "a list of media ids to associate with the tweet",
+                      "required": false,
+                      "type": "string"
+                  }
+              ],
+              "x-constraints": ["group(lat,long)"],
+              "responses": {
+                  "200": {
+                      "description": "Success",
+                      "schema": {
+                          "$ref": "#/definitions/Tweets"
+                      }
+                  },
+                  "403": {
+                      "description": "Error"
+                  }
+              }
+          }
+      },
+      "/list/members/create": {
+          "post": {
+              "description": "Returns list of members create",
+              "security": [
+                  {
+                      "oauth": [
+                          "basic"
+                      ]
+                  }
+              ],
+              "parameters": [
+                  {
+                      "name": "list_id",
+                      "in": "query",
+                      "description": "The numerical id of the list",
+                      "required": false,
+                      "type": "number"
+                  },
+                  {
+                      "name": "slug",
+                      "in": "query",
+                      "description": "You can identify a list being requested by a slug",
+                      "required": false,
+                      "type": "string"
+                  },
+                  {
+                      "name": "screen_name",
+                      "in": "query",
+                      "description": "The screen name of the user to add to the list",
+                      "required": false,
+                      "type": "string"
+                  },
+                  {
+                      "name": "user_id",
+                      "in": "query",
+                      "description": "The user ID of the user to add to the list",
+                      "type": "number",
+                      "required": false
+                  },
+                  {
+                      "name": "owner_screen_name",
+                      "in": "query",
+                      "description": "The screen name of the user who owns the list being requested by a slug",
+                      "required": false,
+                      "type": "string"
+                  },
+                  {
+                      "name": "owner_id",
+                      "in": "query",
+                      "description": "The user ID of the user who owns the list being requested by a slug",
+                      "required": false,
+                      "type": "number"
+                  }
+              ],
+              "x-constraints": [
+                "xor(slug, list_id)",
+                "xor(user_id, screen_name)",
+                "present(slug) -> xor(owner_screen_name, owner_id)",
+                "dependent(slug, owner_screen_name)",
+                "dependent(slug, owner_id)"
+              ],
+              "responses": {
+                  "200": {
+                      "description": "Success"
+                  }
+              }
+          }
+      }
+    },
+    "definitions": {
+        "Tweets": {
+            "type": "object",
+            "properties": {
+                "contributors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Contributors"
+                    }
+                },
+                "coordinates": {
+                    "$ref": "#/definitions/Coordinates"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "current_user_retweet": {
+                    "$ref": "#/definitions/Tweets"
+                },
+                "entities": {
+                    "$ref": "#/definitions/Entities"
+                },
+                "favorite_count": {
+                    "type": "number"
+                },
+                "favorited": {
+                    "type": "boolean"
+                },
+                "filter_level": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "id_str": {
+                    "type": "string"
+                },
+                "in_reply_to_screen_name": {
+                    "type": "string"
+                },
+                "in_reply_to_status_id": {
+                    "type": "number"
+                },
+                "in_reply_to_status_id_str": {
+                    "type": "string"
+                },
+                "in_reply_to_user_id": {
+                    "type": "number"
+                },
+                "in_reply_to_user_id_str": {
+                    "type": "string"
+                },
+                "lang": {
+                    "type": "string"
+                },
+                "place": {
+                    "$ref": "#/definitions/Places"
+                },
+                "possibly_sensitive": {
+                    "type": "boolean"
+                },
+                "quoted_status_id": {
+                    "type": "number"
+                },
+                "quoted_status_id_str": {
+                    "type": "string"
+                },
+                "quoted_status": {
+                    "$ref": "#/definitions/Tweets"
+                },
+                "scopes": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "retweet_count": {
+                    "type": "number"
+                },
+                "retweeted": {
+                    "type": "boolean"
+                },
+                "retweeted_status": {
+                    "$ref": "#/definitions/Tweets"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "truncated": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/Users"
+                },
+                "withheld_copyright": {
+                    "type": "boolean"
+                },
+                "withheld_countries": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "withheld_scope": {
+                    "type": "string"
+                }
+            }
+        },
+        "Contributors": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "number"
+                },
+                "id_str": {
+                    "type": "string"
+                },
+                "screen_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "Coordinates": {
+            "type": "object",
+            "properties": {
+                "coordinates": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "Users": {
+            "type": "object",
+            "properties": {
+                "contributors_enabled": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "default_profile": {
+                    "type": "boolean"
+                },
+                "default_profile_image": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "entities": {
+                    "$ref": "#/definitions/Entities"
+                },
+                "favorites_count": {
+                    "type": "number"
+                },
+                "follow_request_sent": {
+                    "type": "boolean"
+                },
+                "following": {
+                    "type": "boolean"
+                },
+                "followers_count": {
+                    "type": "number"
+                },
+                "friends_count": {
+                    "type": "number"
+                },
+                "geo_enabled": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "id_str": {
+                    "type": "string"
+                },
+                "is_translator": {
+                    "type": "boolean"
+                },
+                "lang": {
+                    "type": "string"
+                },
+                "listed_count": {
+                    "type": "number"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notifications": {
+                    "type": "boolean"
+                },
+                "profile_background_color": {
+                    "type": "string"
+                },
+                "profile_background_image_url": {
+                    "type": "string"
+                },
+                "profile_background_image_url_https": {
+                    "type": "string"
+                },
+                "profile_background_tile": {
+                    "type": "string"
+                },
+                "profile_banner_url": {
+                    "type": "string"
+                },
+                "profile_image_url": {
+                    "type": "string"
+                },
+                "profile_image_url_https": {
+                    "type": "string"
+                },
+                "profile_link_color": {
+                    "type": "string"
+                },
+                "profile_sidebar_border_color": {
+                    "type": "string"
+                },
+                "profile_sidebar_fill_color": {
+                    "type": "string"
+                },
+                "profile_text_color": {
+                    "type": "string"
+                },
+                "profile_use_background_image": {
+                    "type": "boolean"
+                },
+                "protected": {
+                    "type": "boolean"
+                },
+                "screen_name": {
+                    "type": "string"
+                },
+                "show_all_inline_media": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "$ref": "#/definitions/Tweets"
+                },
+                "statuses_count": {
+                    "type": "number"
+                },
+                "time_zone": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "utc_offset": {
+                    "type": "number"
+                },
+                "verified": {
+                    "type": "boolean"
+                },
+                "withheld_in_countries": {
+                    "type": "string"
+                },
+                "withheld_scope": {
+                    "type": "string"
+                }
+            }
+        },
+        "Entities": {
+            "type": "object",
+            "properties": {
+                "hashtags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Hashtags"
+                    }
+                },
+                "media": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Media"
+                    }
+                },
+                "urls": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/URL"
+                    }
+                },
+                "user_mentions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User_Mention"
+                    }
+                }
+            }
+        },
+        "Hashtags": {
+            "type": "object",
+            "properties": {
+                "indices": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "Media": {
+            "type": "object",
+            "properties": {
+                "display_url": {
+                    "type": "string"
+                },
+                "expanded_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "id_str": {
+                    "type": "string"
+                },
+                "indices": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "media_url": {
+                    "type": "string"
+                },
+                "media_url_https": {
+                    "type": "string"
+                },
+                "sizes": {
+                    "$ref": "#/definitions/Sizes"
+                },
+                "source_status_id": {
+                    "type": "number"
+                },
+                "source_status_id_str": {
+                    "type": "number"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "Size": {
+            "type": "object",
+            "properties": {
+                "h": {
+                    "type": "number"
+                },
+                "resize": {
+                    "type": "string"
+                },
+                "w": {
+                    "type": "number"
+                }
+            }
+        },
+        "Sizes": {
+            "type": "object",
+            "properties": {
+                "thumb": {
+                    "$ref": "#/definitions/Size"
+                },
+                "large": {
+                    "$ref": "#/definitions/Size"
+                },
+                "medium": {
+                    "$ref": "#/definitions/Size"
+                },
+                "small": {
+                    "$ref": "#/definitions/Size"
+                }
+            }
+        },
+        "URL": {
+            "type": "object",
+            "properties": {
+                "display_url": {
+                    "type": "string"
+                },
+                "expanded_url": {
+                    "type": "string"
+                },
+                "indices": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "User_Mention": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "number"
+                },
+                "id_str": {
+                    "type": "string"
+                },
+                "indices": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "screen_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "Places": {
+            "type": "object",
+            "properties": {
+                "attributes": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "bounding_box": {
+                    "$ref": "#/definitions/Bounding_box"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "country_code": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "place_type": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "Bounding_box": {
+            "type": "object",
+            "properties": {
+                "coordinates": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "Lists": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string"
+                },
+                "following": {
+                    "type": "boolean"
+                },
+                "user": {
+                    "$ref": "#/definitions/Users"
+                },
+                "member_count": {
+                    "type": "number"
+                },
+                "id_str": {
+                    "type": "string"
+                },
+                "subscriber_count": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "uri": {
+                    "type": "string"
+                }
+            }
+        },
+        "Cursor_lists": {
+            "type": "object",
+            "properties": {
+                "previous_cursor": {
+                    "type": "number"
+                },
+                "lists": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Lists"
+                    }
+                },
+                "previous_cursor_str": {
+                    "type": "string"
+                },
+                "next_cursor": {
+                    "type": "number"
+                },
+                "next_cursor_str": {
+                    "type": "string"
+                }
+            }
+        },
+        "Cursor_users": {
+            "type": "object",
+            "properties": {
+                "previous_cursor": {
+                    "type": "number"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Users"
+                    }
+                },
+                "previous_cursor_str": {
+                    "type": "string"
+                },
+                "next_cursor": {
+                    "type": "number"
+                },
+                "next_cursor_str": {
+                    "type": "string"
+                }
+            }
+        },
+        "Cursor_ids": {
+            "type": "object",
+            "properties": {
+                "previous_cursor": {
+                    "type": "number"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "previous_cursor_str": {
+                    "type": "string"
+                },
+                "next_cursor": {
+                    "type": "number"
+                },
+                "next_cursor_str": {
+                    "type": "string"
+                }
+            }
+        },
+        "Messages": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "entities": {
+                    "$ref": "#/definitions/Entities"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "id_string": {
+                    "type": "string"
+                },
+                "recipient": {
+                    "$ref": "#/definitions/Users"
+                },
+                "recipient_id": {
+                    "type": "number"
+                },
+                "recipient_screen_name": {
+                    "type": "string"
+                },
+                "sender": {
+                    "$ref": "#/definitions/Users"
+                },
+                "sender_id": {
+                    "type": "number"
+                },
+                "sender_screen_name": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "Query": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "id_str": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
+        "Friendship": {
+            "type": "object",
+            "properties": {
+                "relationship": {
+                    "$ref": "#/definitions/Targets"
+                },
+                "source": {
+                    "$ref": "#/definitions/Source"
+                }
+            }
+        },
+        "Targets": {
+            "type": "object",
+            "properties": {
+                "target": {
+                    "$ref": "#/definitions/Target"
+                }
+            }
+        },
+        "Target": {
+            "type": "object",
+            "properties": {
+                "id_str": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "followed_by": {
+                    "type": "boolean"
+                },
+                "screen_name": {
+                    "type": "string"
+                },
+                "following": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "Source": {
+            "type": "object",
+            "properties": {
+                "can_dm": {
+                    "type": "boolean"
+                },
+                "blocking": {
+                    "type": "boolean"
+                },
+                "id_str": {
+                    "type": "boolean"
+                },
+                "all_replies": {
+                    "type": "boolean"
+                },
+                "want_retweets": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "marked_spam": {
+                    "type": "boolean"
+                },
+                "followed_by": {
+                    "type": "boolean"
+                },
+                "notifications_enable": {
+                    "type": "boolean"
+                },
+                "screen_name": {
+                    "type": "string"
+                },
+                "following": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "Settings": {
+            "type": "object",
+            "properties": {
+                "sleep_time": {
+                    "$ref": "#/definitions/Sleep"
+                },
+                "use_cookie_personalization": {
+                    "type": "boolean"
+                },
+                "trend_location": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Location"
+                    }
+                },
+                "language": {
+                    "type": "string"
+                },
+                "discoverable_by_email": {
+                    "type": "boolean"
+                },
+                "always_use_https": {
+                    "type": "boolean"
+                },
+                "protected": {
+                    "type": "boolean"
+                },
+                "geo_enabled": {
+                    "type": "boolean"
+                },
+                "show_all_inline_media": {
+                    "type": "boolean"
+                },
+                "screen_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "Sleep": {
+            "type": "object",
+            "properties": {
+                "end_time": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "start_time": {
+                    "type": "string"
+                }
+            }
+        },
+        "Location": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "placeType": {
+                    "$ref": "#/definitions/PlaceType"
+                },
+                "woeid": {
+                    "type": "number"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "countryCode": {
+                    "type": "string"
+                },
+                "parentid": {
+                    "type": "number"
+                }
+            }
+        },
+        "PlaceType": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "number"
+                }
+            }
+        },
+        "TrendInfo": {
+            "type": "object",
+            "properties": {
+                "as_of": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "locations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Location"
+                    }
+                },
+                "trends": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Trends"
+                    }
+                }
+            }
+        },
+        "Trends": {
+            "type": "object",
+            "properties": {
+                "events": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "promoted_content": {
+                    "type": "string"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "Help_Config": {
+            "type": "object",
+            "properties": {
+                "dm_text_character_limit": {
+                    "type": "number"
+                },
+                "characters_reserved_per_media": {
+                    "type": "number"
+                },
+                "max_media_per_upload": {
+                    "type": "number"
+                },
+                "non_username_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "photo_size_limit": {
+                    "type": "number"
+                },
+                "photo_sizes": {
+                    "$ref": "#/definitions/Sizes"
+                }
+            }
+        },
+        "Help_Language": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "Help_Privacy": {
+            "type": "object",
+            "properties": {
+                "privacy": {
+                    "type": "string"
+                }
+            }
+        },
+        "Help_Tos": {
+            "type": "object",
+            "properties": {
+                "Tos": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
