@@ -1,5 +1,5 @@
-/// <reference path='../typed_definitions/swagger.d.ts' />
-/// <reference path='../typed_definitions/node.d.ts' />
+/// <reference path='typed_definitions/swagger.d.ts' />
+/// <reference path='typed_definitions/node.d.ts' />
 //warning: this is a prototype
 // no support for "refs"
 // object types are just "Objects", properties are not taken into account
@@ -8,7 +8,7 @@
 // type constraints are not taken into account either
 // enums are not taken into Account
 var debug = false;
-var SpecToJSON = require('./spec2json.js');
+var SpecToJSON = require('./src/spec2json.js');
 var definitions = [];
 var generated = "";
 exports.addDefinition = function (definition) {
@@ -81,7 +81,7 @@ function generatePath(method, interfaceName, operation, spec) {
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
-exports.generate = function () {
+exports.generate = function (filename) {
     addToGenerated("//Server Stubs");
     for (var _i = 0, definitions_1 = definitions; _i < definitions_1.length; _i++) {
         var d = definitions_1[_i];
@@ -97,7 +97,7 @@ exports.generate = function () {
         }
         addToGenerated("}");
         var fs = require('fs');
-        fs.writeFile('serverstub.ts', generated, function (err) {
+        fs.writeFile(filename, generated, function (err) {
             if (err)
                 throw err;
         });

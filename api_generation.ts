@@ -1,5 +1,5 @@
-/// <reference path='../typed_definitions/swagger.d.ts' />
-/// <reference path='../typed_definitions/node.d.ts' />
+/// <reference path='typed_definitions/swagger.d.ts' />
+/// <reference path='typed_definitions/node.d.ts' />
 
 //warning: this is a prototype
 // no support for "refs"
@@ -10,7 +10,7 @@
 // enums are not taken into Account
 
 var debug = false;
-var SpecToJSON = require('./spec2json.js');
+var SpecToJSON = require('./src/spec2json.js');
 var definitions:Swagger.Spec[] = [];
 let generated = "";
 
@@ -85,7 +85,7 @@ function generatePath(method: string, interfaceName: string, operation: Swagger.
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
-exports.generate = function() {
+exports.generate = function(filename: string) {
   addToGenerated("//Server Stubs");
   for (var d of definitions) {
     addToGenerated("export module " + d.info.title.substr(0,d.info.title.indexOf(' ')) + "{");
@@ -100,7 +100,7 @@ exports.generate = function() {
     }
     addToGenerated("}");
     const fs = require('fs');
-    fs.writeFile('serverstub.ts', generated, (err) => {
+    fs.writeFile(filename, generated, (err) => {
         if (err) throw err;
     });
   }

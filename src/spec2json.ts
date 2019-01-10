@@ -1,9 +1,16 @@
 /// <reference path="../typed_definitions/pegjs.d.ts" />
 /// <reference path="../typed_definitions/node.d.ts" />
 /// <reference path='../typed_definitions/swagger.d.ts' />
-/// <reference path="./predicates.ts" />
+/// <reference path="../typed_definitions/predicates.ts" />
 
 var parser = require('./pegparser.js');
+let debug = false;
+
+function debuginfo(str: string): void {
+  if (debug) {
+    console.log(str);
+  }
+}
 
 export function createJSONFFromSpecification(entrypoint: Swagger.Operation, customDefs: any) {
   var customDefinitions = parseCustomDefinitions(customDefs);
@@ -31,11 +38,11 @@ function predicateToString(predicate: Predicate.PredicateExpression): string | b
           return present.expression + "(" + present.arguments + ")";
         }
         if(["OR", "AND", "NOT", "->"].indexOf(predicate.expression) != -1){
-            console.log("goeie logical expression")
+            debuginfo("goeie logical expression")
             let args = [];
             for (let a of predicate.arguments) {
               let result = predicateToString(a);
-              console.log("result:" + result);
+              debuginfo("result:" + result);
               if (result) {
                 args.push(result);
               } else {

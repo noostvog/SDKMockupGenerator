@@ -1380,8 +1380,16 @@ function peg$parse(input, options) {
       }
       return result;
     }
+
+    var debug = false;
+
+    function debuginfo(str) {
+      if (debug) {
+        console.log(str);
+      }
+    }
     function replaceArgNameByValue(defbody, replaceMap){
-      console.log("replaceArgNameByValue", defbody, replaceMap);
+      debuginfo("replaceArgNameByValue", defbody, replaceMap);
 
       var predops = [">", ">=", "<", "<=", "==", "OR", "AND", "->", "NOT"];
       var predprops = ["value", "string-length", "array-length", "type", "present", "NOT"];
